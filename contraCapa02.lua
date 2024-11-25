@@ -9,7 +9,6 @@ local scene = composer.newScene()
  
 local MARGIN = 30
  
- 
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
 -- -----------------------------------------------------------------------------------
@@ -21,6 +20,30 @@ function scene:create( event )
     -- Code here runs when the scene is first created but has not yet appeared on screen
     
     local bg = display.newImage(sceneGroup,"assets/contra_capa_bg.png",385,510);
+    -- Adicionando o sprite (coração)
+    local options = {
+        width = 253, 
+        height = 468, 
+        numFrames = 2 
+    }
+
+    local sheet = graphics.newImageSheet("assets/skeleton_sheet.png", options)
+    local sequences = {
+        {
+            name = "skeleton_wave",
+            start = 1,
+            count = 2,
+            time = 800,
+            loopCount = 0
+        }
+    }
+
+    local sprite = display.newSprite(sheet, sequences)
+    sprite.x = display.contentCenterX
+    sprite.y = display.contentCenterY - 155
+    sprite:play()
+
+    sceneGroup:insert(sprite)
 
     local btnPrev = display.newImage(
         sceneGroup,
