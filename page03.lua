@@ -79,34 +79,79 @@ function scene:create(event)
         end
     end
 
-    -- Função de toque para os músculos
+    local function calculateDistance(x1, y1, x2, y2)
+        local dx = x2 - x1
+        local dy = y2 - y1
+        return math.sqrt(dx * dx + dy * dy)
+    end
+    
+    -- Lógica de multitouch
+    local finger1, finger2
+    local initialDistance
+    local isZooming = false
+
+
     local function onMuscleTouch(event)
         if event.phase == "began" and event.target == interactionArea then
-            local dx = event.x - event.xStart
-            local dy = event.y - event.yStart
-            pinchStartDistance = math.sqrt(dx * dx + dy * dy)
-            pinchInProgress = true
+            if not finger1 then
+                finger1 = event
+            elseif not finger2 then
+                finger2 = event
+                isZooming = true
+                initialDistance = calculateDistance(finger1.x, finger1.y, finger2.x, finger2.y)
+            end
+        elseif event.phase == "moved" and isZooming then
+            if finger1 and finger2 and event.id == finger1.id then
+                finger1 = event
+            elseif finger1 and finger2 and event.id == finger2.id then
+                finger2 = event
+            end
 
-        elseif event.phase == "moved" and pinchInProgress then
-            local dx = event.x - event.xStart
-            local dy = event.y - event.yStart
-            local currentDistance = math.sqrt(dx * dx + dy * dy)
-
-            -- Detectar gesto de pinça (aumentar ou diminuir)
-            if currentDistance > pinchStartDistance * 1.5 then
-                toggleMuscleState() -- Alternar o estado
-                pinchInProgress = false -- Reiniciar o gesto
-            elseif currentDistance < pinchStartDistance * 0.5 then
-                toggleMuscleState() -- Alternar o estado
-                pinchInProgress = false -- Reiniciar o gesto
+            if finger1 and finger2 then
+                local currentDistance = calculateDistance(finger1.x, finger1.y, finger2.x, finger2.y)
+                -- Não altere o tamanho da imagem aqui, apenas troque os músculos
+                if currentDistance > initialDistance * 1.5 then
+                    toggleMuscleState() -- Alternar o estado para relaxado
+                    initialDistance = currentDistance
+                elseif currentDistance < initialDistance * 0.5 then
+                    toggleMuscleState() -- Alternar o estado para contraído
+                    initialDistance = currentDistance
+                end
             end
         elseif event.phase == "ended" or event.phase == "cancelled" then
-            pinchInProgress = false
-            pinchStartDistance = 0
+            isZooming= false
         end
-
         return true
     end
+
+    -- Função de toque para os músculos
+    -- local function onMuscleTouch(event)
+    --     if event.phase == "began" and event.target == interactionArea then
+    --         local dx = event.x - event.xStart
+    --         local dy = event.y - event.yStart
+    --         pinchStartDistance = math.sqrt(dx * dx + dy * dy)
+    --         pinchInProgress = true
+
+    --     elseif event.phase == "moved" and pinchInProgress then
+    --         local dx = event.x - event.xStart
+    --         local dy = event.y - event.yStart
+    --         local currentDistance = math.sqrt(dx * dx + dy * dy)
+
+    --         -- Detectar gesto de pinça (aumentar ou diminuir)
+    --         if currentDistance > pinchStartDistance * 1.5 then
+    --             toggleMuscleState() -- Alternar o estado
+    --             pinchInProgress = false -- Reiniciar o gesto
+    --         elseif currentDistance < pinchStartDistance * 0.5 then
+    --             toggleMuscleState() -- Alternar o estado
+    --             pinchInProgress = false -- Reiniciar o gesto
+    --         end
+    --     elseif event.phase == "ended" or event.phase == "cancelled" then
+    --         pinchInProgress = false
+    --         pinchStartDistance = 0
+    --     end
+
+    --     return true
+    -- end
 
     -- Adicionar listener global para multitouch
     interactionArea:addEventListener("touch", onMuscleTouch)
