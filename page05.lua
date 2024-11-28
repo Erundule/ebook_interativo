@@ -46,44 +46,45 @@ function scene:create( event )
     scrollView:insert(image)
 
     local btnPrev = display.newImage(
-        sceneGroup,
         "assets/prev.png");
 
 
-    btnPrev.x = MARGIN + 22
-    btnPrev.y = display.contentHeight - MARGIN - 32
+    btnPrev.x = MARGIN + 35
+    btnPrev.y = display.contentCenterY + 1320
 
     btnPrev:addEventListener("tap", function(event)
         composer.gotoScene( "page04" )
     end)
+    scrollView:insert(btnPrev)
 
     local page = display.newImage(
-        sceneGroup,
         "assets/pag_5.png");
 
     page.x = display.contentCenterX
-    page.y = display.contentHeight - MARGIN - 32
+    page.y = display.contentCenterY + 1300
+    scrollView:insert(page)
 
     local btnSound = display.newImage(
-        sceneGroup,
         "assets/sound_off.png");
 
-    btnSound.x = display.contentWidth - MARGIN - 20
-    btnSound.y = display.contentHeight - MARGIN - 88
+    btnSound.x = display.contentCenterX + 320
+    btnSound.y = display.contentCenterY + 1270
 
     -- btnSound:addEventListener("tap"
     -- end)
+    scrollView:insert(btnSound)
 
     local btnNext = display.newImage(
-        sceneGroup,
+        scrollView,
         "assets/next.png");
 
-    btnNext.x = display.contentWidth - MARGIN - 20
-    btnNext.y = display.contentHeight - MARGIN - 32
+    btnNext.x = display.contentCenterX + 320
+    btnNext.y = display.contentCenterY + 1320
 
     btnNext:addEventListener("tap", function(event)
         composer.gotoScene( "contraCapa" )
     end)
+    scrollView:insert(btnNext)
 
 end
  

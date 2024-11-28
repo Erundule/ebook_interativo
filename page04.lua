@@ -37,7 +37,7 @@ function scene:create(event)
     local text = display.newImage("assets/text_pag_4.png", display.contentCenterX, display.contentCenterY + MARGIN)
     scrollView:insert(text)
     
-    local contentPart2 = display.newImage("assets/text_part2_page4.png", display.contentCenterX, display.contentCenterY + 700)
+    local contentPart2 = display.newImage("assets/text_part2_page4.png", display.contentCenterX, display.contentCenterY + 600)
     scrollView:insert(contentPart2)
 
     local neural_net = display.newImage("assets/rede_neural.png", display.contentCenterX, display.contentCenterY + 1120)
@@ -160,12 +160,26 @@ function scene:create(event)
     dragBall:addEventListener("touch", onBallDrag)
 
     local btnPrev = display.newImage("assets/prev.png")
-    btnPrev.x = MARGIN + 22
+    btnPrev.x = MARGIN + 35
     btnPrev.y = display.contentCenterY + 1470
     btnPrev:addEventListener("tap", function()
         composer.gotoScene("page03")
     end)
     scrollView:insert(btnPrev)
+
+    local page = display.newImage(
+        "assets/pag_4.png");
+
+    page.x = display.contentCenterX
+    page.y = display.contentCenterY + 1470
+    scrollView:insert(page)
+
+    local btnSound = display.newImage(
+        "assets/sound_off.png");
+
+    btnSound.x = display.contentCenterX + 320
+    btnSound.y = display.contentCenterY + 1420
+    scrollView:insert(btnSound)
 
     local btnNext = display.newImage("assets/next.png")
     btnNext.x = display.contentCenterX + 320
