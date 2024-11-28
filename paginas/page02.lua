@@ -141,7 +141,7 @@ function scene:create(event)
     btnPrev.x = MARGIN + 22
     btnPrev.y = display.contentHeight - MARGIN - 32
     btnPrev:addEventListener("tap", function(event)
-        composer.gotoScene("page01")
+        composer.gotoScene("paginas.page01")
     end)
 
     local page = display.newImage(sceneGroup, "assets/pag_2.png")
@@ -152,7 +152,7 @@ function scene:create(event)
     btnNext.x = display.contentWidth - MARGIN - 20
     btnNext.y = display.contentHeight - MARGIN - 32
     btnNext:addEventListener("tap", function(event)
-        composer.gotoScene("page03")
+        composer.gotoScene("paginas.page03")
     end)
 end
 

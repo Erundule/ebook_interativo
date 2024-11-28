@@ -109,7 +109,7 @@ function scene:create( event )
     btnPrev.y = display.contentCenterY + 1470
 
     btnPrev:addEventListener("tap", function(event)
-        composer.gotoScene( "page04" )
+        composer.gotoScene( "paginas.page04" )
     end)
     scrollView:insert(btnPrev)
 
@@ -129,7 +129,7 @@ function scene:create( event )
     btnNext.y = display.contentCenterY + 1470
 
     btnNext:addEventListener("tap", function(event)
-        composer.gotoScene( "contraCapa" )
+        composer.gotoScene( "paginas.contraCapa" )
     end)
     scrollView:insert(btnNext)
 

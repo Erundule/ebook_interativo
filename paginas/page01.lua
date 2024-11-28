@@ -1,5 +1,5 @@
 local composer = require( "composer" )
- 
+local audio = require("audio")
 local scene = composer.newScene()
  
 -- -----------------------------------------------------------------------------------
@@ -8,7 +8,7 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
  
 local MARGIN = 30
- 
+
 -- -----------------------------------------------------------------------------------
 -- Funções de Controle de Áudio
 -- -----------------------------------------------------------------------------------
@@ -62,77 +62,54 @@ end
 
 
 local function createAudioButton(sceneGroup)
-    local btnSoundOn = display.newImage(sceneGroup, "assets/sound_on_blue.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 32)
-    local btnSoundOff = display.newImage(sceneGroup, "assets/sound_off_blue.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 32)
+    local btnSoundOn = display.newImage(sceneGroup, "assets/sound_on.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 88)
+    local btnSoundOff = display.newImage(sceneGroup, "assets/sound_off.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 88)
     btnSoundOff.isVisible = false
 
-    setSound(sceneGroup, "assets/audio/conteudo_contracapa.mp3", btnSoundOn, btnSoundOff)
+    setSound(sceneGroup, "assets/audio/conteudo_1.mp3", btnSoundOn, btnSoundOff)
 end
 
- 
--- -----------------------------------------------------------------------------------
--- Scene event functions
--- -----------------------------------------------------------------------------------
- 
--- create()
-function scene:create( event )
- 
+function scene:create(event)
     local sceneGroup = self.view
-    -- Code here runs when the scene is first created but has not yet appeared on screen
-    
-    local bg = display.newImage(sceneGroup,"assets/contra_capa_bg.png",385,510);
-    -- Adicionando o sprite (coração)
-    local options = {
-        width = 253, 
-        height = 468, 
-        numFrames = 2 
-    }
 
-    local sheet = graphics.newImageSheet("assets/skeleton_sheet.png", options)
-    local sequences = {
-        {
-            name = "skeleton_wave",
-            start = 1,
-            count = 2,
-            time = 800,
-            loopCount = 0
-        }
-    }
+    local bg = display.newImage(sceneGroup, "assets/paginas_bg.png", 385, 510)
 
-    local sprite = display.newSprite(sheet, sequences)
-    sprite.x = display.contentCenterX
-    sprite.y = display.contentCenterY - 130
-    sprite:play()
+    local text = display.newImage(sceneGroup, "assets/text_pag_1.png", 385, 250)
+    local image_body = display.newImage(sceneGroup, "assets/body.png", 385, 600)
 
-    sceneGroup:insert(sprite)
+    local isBodyInfoVisible = false
 
-    local btnPrev = display.newImage(
-        sceneGroup,
-        "assets/prev_cc.png");
-
-    btnPrev.x = MARGIN + 22
-    btnPrev.y = display.contentHeight - MARGIN - 32
-
-    btnPrev:addEventListener("tap", function(event)
-        composer.gotoScene( "contraCapa" )
+    image_body:addEventListener("tap", function(event)
+        if isBodyInfoVisible then
+            display.remove(sceneGroup.bodyInfo)
+            sceneGroup.bodyInfo = display.newImage(sceneGroup, "assets/body.png", 385, 600)
+        else
+            display.remove(sceneGroup.bodyInfo)
+            sceneGroup.bodyInfo = display.newImage(sceneGroup, "assets/body_info.png", 385, 700)
+            isBodyInfoVisible = true
+        end
     end)
-
-    local page = display.newImage(
-        sceneGroup,
-        "assets/home.png");
-
-    page.x = display.contentCenterX
-    page.y = display.contentHeight - MARGIN - 32
-
-    page:addEventListener("tap", function(event)
-        composer.gotoScene( "capa" )
-    end)
-
 
     createAudioButton(sceneGroup)
 
+    local btnPrev = display.newImage(sceneGroup, "assets/prev.png")
+    btnPrev.x = MARGIN + 22
+    btnPrev.y = display.contentHeight - MARGIN - 32
+    btnPrev:addEventListener("tap", function(event)
+        composer.gotoScene("paginas.capa")
+    end)
+
+    local page = display.newImage(sceneGroup, "assets/pag_1.png")
+    page.x = display.contentCenterX
+    page.y = display.contentHeight - MARGIN - 32
+
+    local btnNext = display.newImage(sceneGroup, "assets/next.png")
+    btnNext.x = display.contentWidth - MARGIN - 20
+    btnNext.y = display.contentHeight - MARGIN - 32
+    btnNext:addEventListener("tap", function(event)
+        composer.gotoScene("paginas.page02")
+    end)
 end
- 
 -- show()
 function scene:show( event )
  

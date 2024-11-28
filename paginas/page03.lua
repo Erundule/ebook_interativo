@@ -181,7 +181,7 @@ function scene:create(event)
     btnPrev.x = MARGIN + 35
     btnPrev.y = display.contentCenterY + 1470
     btnPrev:addEventListener("tap", function()
-        composer.gotoScene("page02")
+        composer.gotoScene("paginas.page02")
     end)
     scrollView:insert(btnPrev)
 
@@ -194,7 +194,7 @@ function scene:create(event)
     btnNext.x = display.contentCenterX + 320
     btnNext.y = display.contentCenterY + 1470
     btnNext:addEventListener("tap", function()
-        composer.gotoScene("page04")
+        composer.gotoScene("paginas.page04")
     end)
     scrollView:insert(btnNext)
 end
