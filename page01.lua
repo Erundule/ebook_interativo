@@ -1,5 +1,5 @@
 local composer = require( "composer" )
- 
+local audio = require("audio")
 local scene = composer.newScene()
  
 -- -----------------------------------------------------------------------------------
@@ -8,38 +8,100 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
  
 local MARGIN = 30
- 
--- -----------------------------------------------------------------------------------
--- Scene event functions
--- -----------------------------------------------------------------------------------
- 
--- create()
-function scene:create( event )
-    local sceneGroup = self.view
-    -- Code here runs when the scene is first created but has not yet appeared on screen
-    local bg = display.newImage(sceneGroup,"assets/paginas_bg.png",385,510)
+local narrationSound
+local narrationChannel
+local isMuted = false
+local isPlaying = false
 
-    local text = display.newImage(sceneGroup,"assets/text_pag_1.png",385,250)
-    local image_body = display.newImage(sceneGroup,"assets/body.png",385,600)
-    
-    -- Adiciona um flag para alternar entre os estados da imagem
-    local isBodyInfoVisible = false  -- Define que a imagem de "body_info" não está visível inicialmente
-    
+-- -----------------------------------------------------------------------------------
+-- Funções de Controle de Áudio
+-- -----------------------------------------------------------------------------------
+
+local soundTrack
+
+-- Função para alternar a visibilidade dos botões
+local function soundVisibilitySwitch(btnSoundOn, btnSoundOff)
+    btnSoundOff.isVisible = not btnSoundOff.isVisible
+    btnSoundOn.isVisible = not btnSoundOn.isVisible
+end
+
+-- Função para configurar o som
+local function setSound(sceneGroup, soundPath, btnSoundOn, btnSoundOff)
+    soundTrack = audio.loadStream(soundPath)
+
+    local function soundEnd(event)
+        if event.completed then
+            soundVisibilitySwitch(btnSoundOn, btnSoundOff)
+        end
+    end
+
+    local soundOptions = {
+        channel = 1,
+        loops = 0,
+        fadein = 50,
+        onComplete = soundEnd
+    }
+
+    local function soundEvent()
+        soundVisibilitySwitch(btnSoundOn, btnSoundOff)
+        if btnSoundOff.isVisible then
+            audio.stop(1)
+            audio.rewind(soundTrack)
+        else
+            audio.play(soundTrack, soundOptions)
+        end
+    end
+
+    -- Adiciona os botões ao grupo da cena
+    sceneGroup:insert(btnSoundOn)
+    sceneGroup:insert(btnSoundOff)
+
+    -- Associa o evento de toque aos botões
+    btnSoundOn:addEventListener("tap", soundEvent)
+    btnSoundOff:addEventListener("tap", soundEvent)
+
+    audio.setVolume(0.5, { channel = 1 })
+
+    -- Toca o áudio automaticamente com fade-in após 1 segundo
+    timer.performWithDelay(1000, function()
+        audio.play(soundTrack, soundOptions)
+        audio.fade({ channel = 1, time = 500, volume = 1 })
+    end)
+end
+
+
+-- Função para criar os botões de áudio no `sceneGroup`
+local function createAudioButton(sceneGroup)
+    local btnSoundOn = display.newImage(sceneGroup, "assets/sound_on.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 88)
+    local btnSoundOff = display.newImage(sceneGroup, "assets/sound_off.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 88)
+    btnSoundOff.isVisible = false
+
+    setSound(sceneGroup, "assets/audio/conteudo_1.mp3", btnSoundOn, btnSoundOff)
+end
+
+function scene:create(event)
+    local sceneGroup = self.view
+
+    local bg = display.newImage(sceneGroup, "assets/paginas_bg.png", 385, 510)
+
+    local text = display.newImage(sceneGroup, "assets/text_pag_1.png", 385, 250)
+    local image_body = display.newImage(sceneGroup, "assets/body.png", 385, 600)
+
+    local isBodyInfoVisible = false
+
     image_body:addEventListener("tap", function(event)
         if isBodyInfoVisible then
-            -- Se a imagem de "body_info" estiver visível, retorna para a imagem original
             display.remove(sceneGroup.bodyInfo)
             sceneGroup.bodyInfo = display.newImage(sceneGroup, "assets/body.png", 385, 600)
-            isBodyInfoVisible = false  -- Altera o estado da flag
         else
-            -- Caso contrário, mostra a imagem "body_info"
             display.remove(sceneGroup.bodyInfo)
             sceneGroup.bodyInfo = display.newImage(sceneGroup, "assets/body_info.png", 385, 700)
-            isBodyInfoVisible = true  -- Altera o estado da flag
+            isBodyInfoVisible = true
         end
     end)
-    
-    -- Botão de navegação para voltar à cena anterior
+
+    createAudioButton(sceneGroup)
+
     local btnPrev = display.newImage(sceneGroup, "assets/prev.png")
     btnPrev.x = MARGIN + 22
     btnPrev.y = display.contentHeight - MARGIN - 32
@@ -47,53 +109,53 @@ function scene:create( event )
         composer.gotoScene("capa")
     end)
 
-    -- Página
     local page = display.newImage(sceneGroup, "assets/pag_1.png")
     page.x = display.contentCenterX
     page.y = display.contentHeight - MARGIN - 32
-
-    -- Botões de som e próximo
-    local btnSound = display.newImage(sceneGroup, "assets/sound_off.png")
-    btnSound.x = display.contentWidth - MARGIN - 20
-    btnSound.y = display.contentHeight - MARGIN - 88
 
     local btnNext = display.newImage(sceneGroup, "assets/next.png")
     btnNext.x = display.contentWidth - MARGIN - 20
     btnNext.y = display.contentHeight - MARGIN - 32
     btnNext:addEventListener("tap", function(event)
-        composer.gotoScene("page02", {
-            time = 3000
-        })
+        composer.gotoScene("page02")
     end)
 end
-
 -- show()
 function scene:show( event )
+ 
     local sceneGroup = self.view
     local phase = event.phase
+ 
     if ( phase == "will" ) then
         -- Code here runs when the scene is still off screen (but is about to come on screen)
+ 
     elseif ( phase == "did" ) then
         -- Code here runs when the scene is entirely on screen
+ 
     end
 end
+ 
  
 -- hide()
 function scene:hide( event )
     local sceneGroup = self.view
     local phase = event.phase
+
     if ( phase == "will" ) then
-        -- Code here runs when the scene is on screen (but is about to go off screen)
-    elseif ( phase == "did" ) then
-        -- Code here runs immediately after the scene goes entirely off screen
+        audio.stop(1)  
     end
 end
  
+ 
 -- destroy()
-function scene:destroy( event )
-    local sceneGroup = self.view
-    -- Code here runs prior to the removal of scene's view
+function scene:destroy(event)
+    if soundTrack then
+        audio.stop(1)  -- Parar o áudio no canal 1
+        audio.dispose(soundTrack)  -- Liberar o recurso de áudio
+        soundTrack = nil
+    end
 end
+
 
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners
