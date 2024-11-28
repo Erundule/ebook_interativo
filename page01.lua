@@ -8,10 +8,6 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
  
 local MARGIN = 30
-local narrationSound
-local narrationChannel
-local isMuted = false
-local isPlaying = false
 
 -- -----------------------------------------------------------------------------------
 -- Funções de Controle de Áudio
@@ -19,13 +15,11 @@ local isPlaying = false
 
 local soundTrack
 
--- Função para alternar a visibilidade dos botões
 local function soundVisibilitySwitch(btnSoundOn, btnSoundOff)
     btnSoundOff.isVisible = not btnSoundOff.isVisible
     btnSoundOn.isVisible = not btnSoundOn.isVisible
 end
 
--- Função para configurar o som
 local function setSound(sceneGroup, soundPath, btnSoundOn, btnSoundOff)
     soundTrack = audio.loadStream(soundPath)
 
@@ -52,17 +46,14 @@ local function setSound(sceneGroup, soundPath, btnSoundOn, btnSoundOff)
         end
     end
 
-    -- Adiciona os botões ao grupo da cena
     sceneGroup:insert(btnSoundOn)
     sceneGroup:insert(btnSoundOff)
 
-    -- Associa o evento de toque aos botões
     btnSoundOn:addEventListener("tap", soundEvent)
     btnSoundOff:addEventListener("tap", soundEvent)
 
     audio.setVolume(0.5, { channel = 1 })
 
-    -- Toca o áudio automaticamente com fade-in após 1 segundo
     timer.performWithDelay(1000, function()
         audio.play(soundTrack, soundOptions)
         audio.fade({ channel = 1, time = 500, volume = 1 })
@@ -70,7 +61,6 @@ local function setSound(sceneGroup, soundPath, btnSoundOn, btnSoundOff)
 end
 
 
--- Função para criar os botões de áudio no `sceneGroup`
 local function createAudioButton(sceneGroup)
     local btnSoundOn = display.newImage(sceneGroup, "assets/sound_on.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 88)
     local btnSoundOff = display.newImage(sceneGroup, "assets/sound_off.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 88)
@@ -150,8 +140,8 @@ end
 -- destroy()
 function scene:destroy(event)
     if soundTrack then
-        audio.stop(1)  -- Parar o áudio no canal 1
-        audio.dispose(soundTrack)  -- Liberar o recurso de áudio
+        audio.stop(1)  
+        audio.dispose(soundTrack)  
         soundTrack = nil
     end
 end
