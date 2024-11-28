@@ -42,6 +42,9 @@ function scene:create( event )
     local contentPart2 = display.newImage("assets/text_part2_page5.png", display.contentCenterX, display.contentCenterY + 600)
     scrollView:insert(contentPart2)
 
+    local image = display.newImage("assets/sistema_circulatorio.png", display.contentCenterX, display.contentCenterY + 1000)
+    scrollView:insert(image)
+
     local btnPrev = display.newImage(
         sceneGroup,
         "assets/prev.png");
