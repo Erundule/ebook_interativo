@@ -151,28 +151,36 @@ function scene:create(event)
                 initialDistance = calculateDistance(finger1.x, finger1.y, finger2.x, finger2.y)
             end
         elseif event.phase == "moved" and isZooming then
-            if finger1 and finger2 and event.id == finger1.id then
-                finger1 = event
-            elseif finger1 and finger2 and event.id == finger2.id then
-                finger2 = event
-            end
-
             if finger1 and finger2 then
+                if event.id == finger1.id then
+                    finger1 = event
+                elseif event.id == finger2.id then
+                    finger2 = event
+                end
+    
                 local currentDistance = calculateDistance(finger1.x, finger1.y, finger2.x, finger2.y)
                 if currentDistance > initialDistance * 1.5 then
-                    toggleMuscleState() 
+                    toggleMuscleState()
                     initialDistance = currentDistance
                 elseif currentDistance < initialDistance * 0.5 then
-                    toggleMuscleState() 
+                    toggleMuscleState()
                     initialDistance = currentDistance
                 end
             end
         elseif event.phase == "ended" or event.phase == "cancelled" then
-            isZooming = false
+            if finger1 and event.id == finger1.id then
+                finger1 = nil
+            elseif finger2 and event.id == finger2.id then
+                finger2 = nil
+            end
+    
+            if not finger1 or not finger2 then
+                isZooming = false
+            end
         end
         return true
     end
-
+    
     interactionArea:addEventListener("touch", onMuscleTouch)
     
     createAudioButton(scrollView)
