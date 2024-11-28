@@ -8,7 +8,66 @@ local scene = composer.newScene()
 -- -----------------------------------------------------------------------------------
  
 local MARGIN = 30
- 
+-- -----------------------------------------------------------------------------------
+-- Funções de Controle de Áudio
+-- -----------------------------------------------------------------------------------
+
+local soundTrack
+
+local function soundVisibilitySwitch(btnSoundOn, btnSoundOff)
+    btnSoundOff.isVisible = not btnSoundOff.isVisible
+    btnSoundOn.isVisible = not btnSoundOn.isVisible
+end
+
+local function setSound(sceneGroup, soundPath, btnSoundOn, btnSoundOff)
+    soundTrack = audio.loadStream(soundPath)
+
+    local function soundEnd(event)
+        if event.completed then
+            soundVisibilitySwitch(btnSoundOn, btnSoundOff)
+        end
+    end
+
+    local soundOptions = {
+        channel = 1,
+        loops = 0,
+        fadein = 50,
+        onComplete = soundEnd
+    }
+
+    local function soundEvent()
+        soundVisibilitySwitch(btnSoundOn, btnSoundOff)
+        if btnSoundOff.isVisible then
+            audio.stop(1)
+            audio.rewind(soundTrack)
+        else
+            audio.play(soundTrack, soundOptions)
+        end
+    end
+
+    sceneGroup:insert(btnSoundOn)
+    sceneGroup:insert(btnSoundOff)
+
+    btnSoundOn:addEventListener("tap", soundEvent)
+    btnSoundOff:addEventListener("tap", soundEvent)
+
+    audio.setVolume(0.5, { channel = 1 })
+
+    timer.performWithDelay(1000, function()
+        audio.play(soundTrack, soundOptions)
+        audio.fade({ channel = 1, time = 500, volume = 1 })
+    end)
+end
+
+
+local function createAudioButton(sceneGroup)
+    local btnSoundOn = display.newImage(sceneGroup, "assets/sound_on.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 88)
+    local btnSoundOff = display.newImage(sceneGroup, "assets/sound_off.png", display.contentWidth - MARGIN - 20, display.contentHeight - MARGIN - 88)
+    btnSoundOff.isVisible = false
+
+    setSound(sceneGroup, "assets/audio/conteudo_capa.mp3", btnSoundOn, btnSoundOff)
+end
+
  
 -- -----------------------------------------------------------------------------------
 -- Scene event functions
@@ -35,20 +94,10 @@ function scene:create( event )
         } )
 
     end)
-
-    local btnSound = display.newImage(
-        sceneGroup,
-        "assets/sound_off.png");
-
-    btnSound.x = display.contentWidth - MARGIN - 22
-    btnSound.y = display.contentHeight - MARGIN - 86
-
-    -- btnNext:addEventListener("tap"
-    -- end)
+    createAudioButton(sceneGroup)
     
     
 end
- 
  
 -- show()
 function scene:show( event )
@@ -68,29 +117,25 @@ end
  
 -- hide()
 function scene:hide( event )
- 
     local sceneGroup = self.view
     local phase = event.phase
- 
+
     if ( phase == "will" ) then
-        -- Code here runs when the scene is on screen (but is about to go off screen)
- 
-    elseif ( phase == "did" ) then
-        -- Code here runs immediately after the scene goes entirely off screen
- 
+        audio.stop(1)  
     end
 end
  
  
 -- destroy()
-function scene:destroy( event )
- 
-    local sceneGroup = self.view
-    -- Code here runs prior to the removal of scene's view
- 
+function scene:destroy(event)
+    if soundTrack then
+        audio.stop(1)  
+        audio.dispose(soundTrack)  
+        soundTrack = nil
+    end
 end
- 
- 
+
+
 -- -----------------------------------------------------------------------------------
 -- Scene event function listeners
 -- -----------------------------------------------------------------------------------
